@@ -1,3 +1,21 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "overrides": [
+    {
+      "files": ["components/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/lib/supabase/admin", "**/supabase/admin"],
+                "message": "lib/supabase/admin.ts (service_role) must never be imported from components/**. Use lib/supabase/client.ts instead."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
 }

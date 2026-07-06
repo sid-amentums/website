@@ -2,26 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Compat layer: raw CSS custom properties matching the legacy prototype's
+ * css/style.css design tokens. Kept only so any markup/inline styles ported
+ * verbatim from the prototype (e.g. style="color:var(--red)") still render
+ * correctly. New components should use Tailwind utilities (text-red, bg-off,
+ * etc.) instead of these variables directly.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --w: #ffffff;
+  --off: #f5f4f1;
+  --off2: #ece9e3;
+  --off3: #e0ddd6;
+  --ink: #0a0a0a;
+  --mid: #6b6b6b;
+  --dim: #a0a0a0;
+  --pale: #d0ccc4;
+  --red: #c8171a;
+  --red-bg: rgba(200, 23, 26, 0.07);
+  --red-bdr: rgba(200, 23, 26, 0.18);
+  --border: rgba(0, 0, 0, 0.07);
+  --border2: rgba(0, 0, 0, 0.13);
+  --spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-h: 58px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  background: var(--w);
+  color: var(--ink);
+  line-height: 1.5;
 }
