@@ -1,13 +1,31 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCartStore, cartSubtotal } from '@/lib/cart/store'
 import CartLineItem from '@/components/cart/CartLineItem'
+import { createClient } from '@/lib/supabase/client'
+import { useAuthModalStore } from '@/lib/auth/authModalStore'
 
 export default function CartDrawer() {
+  const router = useRouter()
   const isOpen = useCartStore((s) => s.isOpen)
   const items = useCartStore((s) => s.items)
   const closeDrawer = useCartStore((s) => s.closeDrawer)
+
+  async function handleCheckoutClick() {
+    const supabase = createClient()
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    closeDrawer()
+    if (session) {
+      router.push('/checkout')
+    } else {
+      useAuthModalStore.getState().open('checkout')
+    }
+  }
   const subtotal = cartSubtotal(items)
 
   return (
@@ -55,13 +73,12 @@ export default function CartDrawer() {
               <span className="text-mid">Subtotal</span>
               <span className="font-medium text-ink">₹{subtotal.toLocaleString('en-IN')}</span>
             </div>
-            <Link
-              href="/checkout"
-              onClick={closeDrawer}
+            <button
+              onClick={handleCheckoutClick}
               className="block w-full rounded-pill bg-ink py-3.5 text-center text-sm font-medium text-w transition-colors hover:bg-red"
             >
               Checkout
-            </Link>
+            </button>
           </div>
         ) : null}
       </aside>

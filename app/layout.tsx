@@ -4,6 +4,8 @@ import Script from 'next/script'
 import { getAppSettings } from '@/lib/settings/appSettings'
 import CartProvider from '@/components/cart/CartProvider'
 import CartDrawer from '@/components/cart/CartDrawer'
+import AuthModal from '@/components/auth/AuthModal'
+import AuthListener from '@/components/auth/AuthListener'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -35,6 +37,8 @@ export default async function RootLayout({
       <body className={`${dmSans.variable} ${dmSerif.variable} font-sans antialiased`}>
         <CartProvider />
         <CartDrawer />
+        <AuthListener />
+        <AuthModal />
         {children}
         {ga_measurement_id ? (
           <>
