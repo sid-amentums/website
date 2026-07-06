@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { DM_Sans, DM_Serif_Display } from 'next/font/google'
 import Script from 'next/script'
 import { getAppSettings } from '@/lib/settings/appSettings'
+import CartProvider from '@/components/cart/CartProvider'
+import CartDrawer from '@/components/cart/CartDrawer'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -31,6 +33,8 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} ${dmSerif.variable} font-sans antialiased`}>
+        <CartProvider />
+        <CartDrawer />
         {children}
         {ga_measurement_id ? (
           <>
