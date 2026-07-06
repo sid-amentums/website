@@ -17,6 +17,7 @@ type CartStore = {
   removeItem: (productId: string, variantId: string) => void
   updateQuantity: (productId: string, variantId: string, quantity: number) => void
   setItems: (items: CartItem[]) => void
+  hydrateFromServer: (items: CartItem[]) => void
   openDrawer: () => void
   closeDrawer: () => void
 }
@@ -54,6 +55,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
     setGuestCart(items)
     set({ items })
   },
+
+  // Used once after a successful guest-cart-merge-on-login: reflects the
+  // authoritative server cart in memory WITHOUT writing it back to the guest
+  // localStorage cart. Writing it back would cause the (still-present) guest
+  // cart to be re-submitted and re-merged on every subsequent auth event,
+  // doubling quantities each time.
+  hydrateFromServer: (items) => set({ items }),
 
   openDrawer: () => set({ isOpen: true }),
   closeDrawer: () => set({ isOpen: false }),

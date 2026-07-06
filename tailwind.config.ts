@@ -36,6 +36,20 @@ const config: Config = {
       borderRadius: {
         pill: '26px',
       },
+      keyframes: {
+        fall: {
+          '0%': { top: '-100%' },
+          '100%': { top: '200%' },
+        },
+        roll: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        fall: 'fall 2s cubic-bezier(0.16, 1, 0.3, 1) infinite',
+        roll: 'roll 30s linear infinite',
+      },
     },
   },
   plugins: [],

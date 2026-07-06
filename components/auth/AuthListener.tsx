@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { getGuestCart } from '@/lib/cart/guestCart'
+import { getGuestCart, clearGuestCart } from '@/lib/cart/guestCart'
 import { useCartStore } from '@/lib/cart/store'
 import { useAuthModalStore } from '@/lib/auth/authModalStore'
 
@@ -31,7 +31,12 @@ export default function AuthListener() {
           })
           if (res.ok) {
             const { items } = await res.json()
-            useCartStore.getState().setItems(items)
+            // Reflect the merged server cart in memory, then clear the
+            // guest cart from localStorage — leaving the merged items there
+            // would cause them to be re-submitted (and re-merged, doubling
+            // quantities) on every subsequent auth event.
+            useCartStore.getState().hydrateFromServer(items)
+            clearGuestCart()
           }
         } catch {
           // Non-fatal: the guest cart stays in localStorage and can be
