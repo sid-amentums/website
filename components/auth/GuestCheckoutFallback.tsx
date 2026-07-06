@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useAuthModalStore } from '@/lib/auth/authModalStore'
-
-export const GUEST_CHECKOUT_FLAG = 'amentum_guest_checkout'
+import { GUEST_CHECKOUT_FLAG } from '@/lib/auth/guestCheckout'
 
 export default function GuestCheckoutFallback() {
   const router = useRouter()
