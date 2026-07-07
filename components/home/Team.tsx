@@ -11,7 +11,7 @@ const TEAM = [
   {
     name: 'Siddharth Patil',
     role: 'Co-Founder',
-    bio: "Represented India at Asia-Pacific Tchoukball Championship 2010. Co-founded CoachKhoj. Headed IT & Strategy for Tensports parent company Zee TAJ TV. Brings technology, operations, customer service and strategy to Amentum's day-to-day operations and growth.",
+    bio: 'He is a sports entrepreneur, technology strategist, Partner & Co-Founder of Amentum Sports, and Director of Kridati Sports Management Pvt. Ltd., the parent company of CoachKhoj. He is also associated with Unido Football Club and is a former National Tchoukball athlete. Passionate about sports, technology, and innovation, he is committed to building impactful solutions that advance athlete development and the sports ecosystem.',
     img: 'https://static.wixstatic.com/media/a4300d_26207ed97efa4784aaf02a43c30b12f8~mv2.png/v1/fill/w_200,h_200,al_c,q_85/Siddharth%20Patl%20-%20Founder%20-%20Partner%20-%20CoachKhoj%20-%20Amentum%20Sports.png',
   },
 ]
