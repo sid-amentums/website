@@ -16,7 +16,7 @@ export default function AjcSection() {
       >
         AJC
       </div>
-      <div className="relative z-10 max-w-3xl">
+      <div className="relative z-10 max-w-5xl">
         <Reveal variant="up">
           <div className="mb-3.5 text-[11px] font-medium uppercase tracking-wide text-red">
             Flagship Event
@@ -38,7 +38,7 @@ export default function AjcSection() {
           </p>
         </Reveal>
         <Reveal variant="scale">
-          <div className="grid max-w-xl grid-cols-2 gap-px bg-white/[0.07] md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-px bg-white/[0.07] md:grid-cols-4">
             {AJC_STATS.map((s) => (
               <div key={s.l} className="bg-white/[0.04] px-6 py-7">
                 <div className={`font-serif text-4xl leading-none tracking-tight ${s.color}`}>
