@@ -47,8 +47,8 @@ export default function BrandAmbassador() {
           </div>
         </Reveal>
 
-        <div className="relative flex min-h-[420px] items-end justify-center overflow-hidden bg-ink md:min-h-[580px]">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#7a0e10] to-red" />
+        <div className="relative flex min-h-[420px] items-end justify-center overflow-hidden bg-red md:min-h-[580px]">
+          <div className="absolute inset-0 bg-gradient-to-br from-red to-[#a01215]" />
           <div className="absolute right-5 top-5 z-10">
             <Image
               src="/images/brand/amentum_logo.png"
