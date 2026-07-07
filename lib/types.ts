@@ -54,6 +54,22 @@ export type OrderStatus = 'created' | 'paid' | 'failed' | 'refunded' | 'cancelle
 
 export type ShippingStatus = 'pending' | 'packed' | 'shipped' | 'out_for_delivery' | 'delivered'
 
+export type ArticleStatus = 'draft' | 'published'
+
+export type Article = {
+  id: string
+  slug: string
+  title: string
+  category: string
+  author: string
+  summary: string | null
+  read_time: string | null
+  body: string
+  status: ArticleStatus
+  published_at: string | null
+  created_at: string
+}
+
 export type Order = {
   id: string
   user_id: string | null

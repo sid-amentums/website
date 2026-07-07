@@ -29,6 +29,9 @@ export default function AdminNav() {
         <Link href="/admin/orders" className={linkClass('/admin/orders')}>
           Orders
         </Link>
+        <Link href="/admin/articles" className={linkClass('/admin/articles')}>
+          Articles
+        </Link>
         <Link href="/admin/settings" className={linkClass('/admin/settings')}>
           Settings
         </Link>

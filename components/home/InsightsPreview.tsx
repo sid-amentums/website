@@ -1,30 +1,20 @@
+import Link from 'next/link'
 import Reveal from '@/components/home/Reveal'
+import { createClient } from '@/lib/supabase/server'
+import type { Article } from '@/lib/types'
 
-const ARTICLES = [
-  {
-    cat: 'India News · May 2025',
-    title: "Neeraj Chopra Breaks 90m — India's Greatest Athletic Milestone",
-    body: 'On May 16, 2025, Neeraj Chopra became the first Indian athlete to throw beyond 90 metres — 90.23m at the Doha Diamond League.',
-    read: '8 min read',
-  },
-  {
-    cat: 'India News · July 2025',
-    title: 'NC Classic 2025: India Hosts Its First World Athletics Gold Level Event',
-    body: "Neeraj Chopra won the inaugural NC Classic in Bengaluru with 86.18m — India's first-ever World Athletics Continental Tour Gold event.",
-    read: '7 min read',
-  },
-  {
-    cat: 'World Athletics · August 2024',
-    title: "Arshad Nadeem's 92.97m Olympic Record — A New Era for South Asian Javelin",
-    body: "At Paris 2024, Pakistan's Arshad Nadeem threw 92.97m to win Olympic gold — an Olympic and Asian record — while Neeraj Chopra took silver with 89.45m.",
-    read: '7 min read',
-  },
-]
+export default async function InsightsPreview() {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(3)
 
-// Static preview only — Insights/Blog CMS (Module 3) isn't built yet, so
-// these cards aren't wired to real article pages/modals. Content is ported
-// verbatim from the legacy prototype's DEFAULT_ARTICLES.
-export default function InsightsPreview() {
+  const articles = (data ?? []) as Article[]
+  if (articles.length === 0) return null
+
   return (
     <section className="bg-off px-6 pb-0 pt-[72px] md:px-12">
       <Reveal variant="up" className="mb-12 flex flex-wrap items-end justify-between gap-4">
@@ -34,27 +24,47 @@ export default function InsightsPreview() {
           </div>
           <h2 className="font-serif text-3xl text-ink md:text-5xl">From the field.</h2>
         </div>
-        <span className="rounded-pill border border-border-2 px-5 py-2 text-xs font-medium text-dim">
+        <Link
+          href="/insights"
+          className="rounded-pill border border-border-2 px-5 py-2 text-xs font-medium text-ink transition-colors hover:border-ink"
+        >
           All articles →
-        </span>
+        </Link>
       </Reveal>
       <Reveal variant="scale">
         <div className="grid grid-cols-1 gap-px bg-pale md:grid-cols-3">
-          {ARTICLES.map((a) => (
-            <div key={a.title} className="bg-w p-9 transition-colors hover:bg-off">
-              <div className="mb-3 text-[10px] font-medium uppercase tracking-wide text-red">
-                {a.cat}
-              </div>
-              <div className="mb-2.5 font-serif text-xl leading-snug tracking-tight text-ink">
-                {a.title}
-              </div>
-              <div className="mt-2 text-[13px] leading-relaxed text-mid">{a.body}</div>
-              <div className="mt-2 text-xs text-dim">{a.read}</div>
-              <span className="mt-4 inline-block text-xs font-medium text-ink">
-                Read Full Article →
-              </span>
-            </div>
-          ))}
+          {articles.map((article) => {
+            const date = article.published_at
+              ? new Date(article.published_at).toLocaleDateString('en-IN', {
+                  month: 'short',
+                  year: 'numeric',
+                })
+              : null
+            return (
+              <Link
+                key={article.id}
+                href={`/insights/${article.slug}`}
+                className="block bg-w p-9 transition-colors hover:bg-off"
+              >
+                <div className="mb-3 text-[10px] font-medium uppercase tracking-wide text-red">
+                  {article.category}
+                  {date ? ` · ${date}` : ''}
+                </div>
+                <div className="mb-2.5 font-serif text-xl leading-snug tracking-tight text-ink">
+                  {article.title}
+                </div>
+                {article.summary ? (
+                  <div className="mt-2 text-[13px] leading-relaxed text-mid">{article.summary}</div>
+                ) : null}
+                {article.read_time ? (
+                  <div className="mt-2 text-xs text-dim">{article.read_time} read</div>
+                ) : null}
+                <span className="mt-4 inline-block text-xs font-medium text-ink">
+                  Read Full Article →
+                </span>
+              </Link>
+            )
+          })}
         </div>
       </Reveal>
     </section>
