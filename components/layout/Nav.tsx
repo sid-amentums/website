@@ -1,8 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import NavCartButton from '@/components/cart/NavCartButton'
+import { createClient } from '@/lib/supabase/server'
 
-export default function Nav() {
+export default async function Nav() {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <nav className="fixed inset-x-0 top-0 z-[600] flex h-nav items-center justify-between border-b border-border bg-w/90 px-6 backdrop-blur-xl md:px-12">
       <Link href="/" className="flex items-center gap-2.5">
@@ -23,6 +29,16 @@ export default function Nav() {
             Shop
           </Link>
         </li>
+        {user ? (
+          <li>
+            <Link
+              href="/account/orders"
+              className="text-xs text-mid transition-colors hover:text-ink"
+            >
+              My Orders
+            </Link>
+          </li>
+        ) : null}
       </ul>
 
       <div className="flex items-center gap-4">

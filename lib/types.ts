@@ -41,3 +41,35 @@ export type CartItem = {
   unit_price_snapshot: number
   quantity: number
 }
+
+export type ShippingAddressRecord = {
+  line1: string
+  city: string
+  state: string
+  pincode: string
+  country: string
+}
+
+export type OrderStatus = 'created' | 'paid' | 'failed' | 'refunded' | 'cancelled'
+
+export type ShippingStatus = 'pending' | 'packed' | 'shipped' | 'out_for_delivery' | 'delivered'
+
+export type Order = {
+  id: string
+  user_id: string | null
+  is_guest_order: boolean
+  items: CartItem[]
+  subtotal_inr: number
+  discount_inr: number
+  amount_inr: number
+  coupon_code: string | null
+  status: OrderStatus
+  contact_name: string
+  contact_phone: string
+  contact_email: string
+  shipping_address: ShippingAddressRecord
+  awb_number: string | null
+  shipping_status: ShippingStatus
+  paid_at: string | null
+  created_at: string
+}
