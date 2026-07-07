@@ -62,8 +62,8 @@ export default function BrandAmbassador() {
             src="/images/brand/davinder_kang.png"
             alt="Davinder Singh Kang"
             width={480}
-            height={580}
-            className="relative z-[1] w-full max-w-[480px] object-contain"
+            height={720}
+            className="relative z-[1] mix-blend-screen w-full max-w-[420px] object-contain"
           />
           <div className="absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-black/80 to-transparent p-7">
             <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-w">
