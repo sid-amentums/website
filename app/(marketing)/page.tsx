@@ -5,7 +5,6 @@ import FlagshipProducts from '@/components/home/FlagshipProducts'
 import AjcSection from '@/components/home/AjcSection'
 import BrandAmbassador from '@/components/home/BrandAmbassador'
 import MissionSection from '@/components/home/MissionSection'
-import FactsRow from '@/components/home/FactsRow'
 import Pillars from '@/components/home/Pillars'
 import Team from '@/components/home/Team'
 import Athletes from '@/components/home/Athletes'
@@ -23,7 +22,6 @@ export default function HomePage() {
       <AjcSection />
       <BrandAmbassador />
       <MissionSection />
-      <FactsRow />
       <Pillars />
       <Team />
       <Athletes />
