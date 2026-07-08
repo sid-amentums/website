@@ -29,6 +29,11 @@ export default async function Nav() {
             Shop
           </Link>
         </li>
+        <li>
+          <Link href="/insights" className="text-xs text-mid transition-colors hover:text-ink">
+            Insights
+          </Link>
+        </li>
         {user ? (
           <li>
             <Link
