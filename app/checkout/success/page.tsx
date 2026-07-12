@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { CartItem } from '@/lib/types'
+import PurchasePixelEvent from '@/components/checkout/PurchasePixelEvent'
 
 export const revalidate = 0
 
@@ -50,6 +51,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="mx-auto max-w-lg px-6 py-16 text-center">
+      <PurchasePixelEvent orderId={order.id} amountInr={order.amount_inr} items={items} />
       <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366]/10 text-2xl text-[#25D366]">
         ✓
       </div>

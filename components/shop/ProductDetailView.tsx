@@ -1,15 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import type { Product } from '@/lib/types'
 import VariantSelect from '@/components/shop/VariantSelect'
 import AddToCartButton from '@/components/shop/AddToCartButton'
+import { trackPixelEvent } from '@/lib/analytics/metaPixel'
 
 const WHATSAPP_NUMBER = '+919827654830'
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const activeVariants = product.variants.filter((v) => v.active)
+
+  useEffect(() => {
+    trackPixelEvent('ViewContent', {
+      content_ids: product.id,
+      content_name: product.name,
+      content_type: 'product',
+      value: product.variants.find((v) => v.active)?.price_inr,
+      currency: 'INR',
+    })
+  }, [product])
   const [variantId, setVariantId] = useState(activeVariants[0]?.id ?? '')
   const selectedVariant = activeVariants.find((v) => v.id === variantId) ?? activeVariants[0]
   const images = [...product.images].sort((a, b) => a.sort_order - b.sort_order)

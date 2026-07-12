@@ -2,6 +2,7 @@
 
 import type { Product, ProductVariant } from '@/lib/types'
 import { useCartStore } from '@/lib/cart/store'
+import { trackPixelEvent } from '@/lib/analytics/metaPixel'
 
 export default function AddToCartButton({
   product,
@@ -16,7 +17,7 @@ export default function AddToCartButton({
 
   return (
     <button
-      onClick={() =>
+      onClick={() => {
         addItem({
           product_id: product.id,
           variant_id: variant.id,
@@ -25,7 +26,14 @@ export default function AddToCartButton({
           unit_price_snapshot: variant.price_inr,
           quantity: 1,
         })
-      }
+        trackPixelEvent('AddToCart', {
+          content_ids: product.id,
+          content_name: product.name,
+          content_type: 'product',
+          value: variant.price_inr,
+          currency: 'INR',
+        })
+      }}
       className={
         className ??
         'rounded-pill bg-ink px-5 py-2 text-xs font-medium text-w transition-all duration-200 hover:bg-red'

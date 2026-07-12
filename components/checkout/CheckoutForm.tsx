@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCartStore, cartSubtotal } from '@/lib/cart/store'
 import { INDIAN_STATES } from '@/lib/constants'
 import CouponInput, { type AppliedCoupon } from '@/components/checkout/CouponInput'
 import RazorpayButton from '@/components/checkout/RazorpayButton'
+import { trackPixelEvent } from '@/lib/analytics/metaPixel'
 
 export type ShippingAddress = {
   line1: string
@@ -31,6 +32,17 @@ export default function CheckoutForm({ isGuestCheckout }: { isGuestCheckout: boo
 
   const discount = appliedCoupon?.discountInr ?? 0
   const total = Math.max(0, subtotal - discount)
+
+  useEffect(() => {
+    if (items.length === 0) return
+    trackPixelEvent('InitiateCheckout', {
+      content_ids: items.map((i) => i.product_id).join(','),
+      value: subtotal,
+      currency: 'INR',
+      num_items: items.length,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once when checkout is first reached, not on every cart edit
+  }, [])
 
   const fieldsValid =
     firstName.trim() &&

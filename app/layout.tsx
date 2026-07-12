@@ -30,7 +30,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const { ga_measurement_id } = await getAppSettings()
+  const { ga_measurement_id, meta_pixel_id } = await getAppSettings()
 
   return (
     <html lang="en">
@@ -54,6 +54,34 @@ export default async function RootLayout({
                 gtag('config', '${ga_measurement_id}');
               `}
             </Script>
+          </>
+        ) : null}
+        {meta_pixel_id ? (
+          <>
+            <Script id="meta-pixel-init" strategy="afterInteractive">
+              {`
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '${meta_pixel_id}');
+                fbq('track', 'PageView');
+              `}
+            </Script>
+            <noscript>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                height="1"
+                width="1"
+                style={{ display: 'none' }}
+                src={`https://www.facebook.com/tr?id=${meta_pixel_id}&ev=PageView&noscript=1`}
+                alt=""
+              />
+            </noscript>
           </>
         ) : null}
       </body>
