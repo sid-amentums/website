@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { Product } from '@/lib/types'
+import ImageHoverPreview from '@/components/admin/ImageHoverPreview'
 
 function ProductRow({ product }: { product: Product }) {
   const [active, setActive] = useState(product.active)
@@ -30,8 +31,10 @@ function ProductRow({ product }: { product: Product }) {
       <td className="px-3 py-3 align-top">
         <div className="flex items-center gap-3">
           {primaryImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={primaryImage.url} alt={primaryImage.alt} className="h-10 w-10 rounded object-contain" />
+            <ImageHoverPreview src={primaryImage.url} alt={primaryImage.alt}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={primaryImage.url} alt={primaryImage.alt} className="h-10 w-10 rounded object-contain" />
+            </ImageHoverPreview>
           ) : (
             <div className="h-10 w-10 rounded bg-off" />
           )}

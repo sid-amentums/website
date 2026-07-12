@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import type { Product, ProductVariant, ProductImage } from '@/lib/types'
+import ImageHoverPreview from '@/components/admin/ImageHoverPreview'
 
 function slugify(name: string) {
   return name
@@ -404,9 +405,11 @@ export default function ProductForm({ product }: { product?: Product }) {
         <div className="flex flex-wrap gap-3">
           {images.map((img, i) => (
             <div key={img.url} className="w-32 rounded-lg border border-border-2 bg-off p-2">
-              <div className="mb-1.5 flex aspect-square items-center justify-center overflow-hidden rounded bg-w">
-                <Image src={img.url} alt={img.alt} width={112} height={112} className="h-full w-full object-contain" />
-              </div>
+              <ImageHoverPreview src={img.url} alt={img.alt}>
+                <div className="mb-1.5 flex aspect-square items-center justify-center overflow-hidden rounded bg-w">
+                  <Image src={img.url} alt={img.alt} width={112} height={112} className="h-full w-full object-contain" />
+                </div>
+              </ImageHoverPreview>
               <input
                 value={img.alt}
                 onChange={(e) => updateImageAlt(img.url, e.target.value)}
