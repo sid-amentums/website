@@ -23,6 +23,9 @@ export default function AdminNav() {
         <span className="font-serif text-lg text-ink">
           <em className="text-red not-italic">A</em>mentum Admin
         </span>
+        <Link href="/admin" className={linkClass('/admin')}>
+          Dashboard
+        </Link>
         <Link href="/admin/products" className={linkClass('/admin/products')}>
           Products
         </Link>

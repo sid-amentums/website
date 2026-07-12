@@ -39,7 +39,7 @@ export default function AdminLoginPage() {
       return
     }
 
-    router.push('/admin/settings')
+    router.push('/admin')
     router.refresh()
   }
 
