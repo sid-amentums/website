@@ -11,7 +11,9 @@ export default async function AdminSettingsPage() {
   const supabase = createClient()
   const { data: settings } = await supabase
     .from('app_settings')
-    .select('razorpay_key_id, ga_measurement_id')
+    .select(
+      'razorpay_key_id, ga_measurement_id, meta_pixel_id, whatsapp_phone_number_id, whatsapp_business_account_id, whatsapp_template_name, mailchimp_audience_id'
+    )
     .eq('id', 1)
     .single()
 
@@ -21,8 +23,15 @@ export default async function AdminSettingsPage() {
       <div className="mx-auto max-w-lg px-6 py-10">
         <h1 className="mb-6 font-serif text-2xl text-ink">Settings</h1>
         <SettingsForm
-          initialKeyId={settings?.razorpay_key_id ?? ''}
-          initialGaId={settings?.ga_measurement_id ?? ''}
+          initial={{
+            razorpayKeyId: settings?.razorpay_key_id ?? '',
+            gaId: settings?.ga_measurement_id ?? '',
+            metaPixelId: settings?.meta_pixel_id ?? '',
+            whatsappPhoneNumberId: settings?.whatsapp_phone_number_id ?? '',
+            whatsappBusinessAccountId: settings?.whatsapp_business_account_id ?? '',
+            whatsappTemplateName: settings?.whatsapp_template_name ?? '',
+            mailchimpAudienceId: settings?.mailchimp_audience_id ?? '',
+          }}
         />
       </div>
     </div>

@@ -4,7 +4,12 @@ import { requireAdmin } from '@/lib/auth/requireAdmin'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 const schema = z.object({
-  secretName: z.enum(['razorpay_key_secret', 'razorpay_webhook_secret']),
+  secretName: z.enum([
+    'razorpay_key_secret',
+    'razorpay_webhook_secret',
+    'whatsapp_access_token',
+    'mailchimp_api_key',
+  ]),
   secretValue: z.string().min(1),
 })
 

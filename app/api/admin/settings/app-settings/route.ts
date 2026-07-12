@@ -6,6 +6,11 @@ import { createClient } from '@/lib/supabase/server'
 const schema = z.object({
   razorpay_key_id: z.string().min(1).optional(),
   ga_measurement_id: z.string().optional(),
+  meta_pixel_id: z.string().optional(),
+  whatsapp_phone_number_id: z.string().optional(),
+  whatsapp_business_account_id: z.string().optional(),
+  whatsapp_template_name: z.string().optional(),
+  mailchimp_audience_id: z.string().optional(),
 })
 
 // RLS's app_settings_update_admin_only policy already permits this via the
