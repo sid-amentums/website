@@ -11,7 +11,7 @@ export default async function ShopPage() {
     .select('*')
     .eq('active', true)
     .order('category', { ascending: true })
-    .order('name', { ascending: true })
+    .order('sort_order', { ascending: true })
 
   const products = (data ?? []) as Product[]
 

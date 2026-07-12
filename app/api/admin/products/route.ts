@@ -19,9 +19,20 @@ export async function POST(request: Request) {
   }
 
   const supabase = createClient()
+
+  // New products default to the end of the manual sort order (set via
+  // drag-and-drop on the admin product list) rather than jumping to the
+  // front, which sort_order's table-wide default of 0 would otherwise do.
+  const { data: maxRow } = await supabase
+    .from('products')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
   const { data: inserted, error } = await supabase
     .from('products')
-    .insert(parsed.data)
+    .insert({ ...parsed.data, sort_order: (maxRow?.sort_order ?? 0) + 1 })
     .select('id')
     .single()
 

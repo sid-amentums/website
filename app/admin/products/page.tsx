@@ -13,7 +13,7 @@ export default async function AdminProductsPage() {
   if (!admin) redirect('/admin/login')
 
   const supabase = createClient()
-  const { data } = await supabase.from('products').select('*').order('name', { ascending: true })
+  const { data } = await supabase.from('products').select('*').order('sort_order', { ascending: true })
 
   return (
     <div>

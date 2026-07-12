@@ -31,6 +31,7 @@ export type Product = {
   stock: number
   checkout_enabled: boolean
   whatsapp_message_template: string | null
+  sort_order: number
 }
 
 export type CartItem = {

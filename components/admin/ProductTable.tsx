@@ -5,7 +5,19 @@ import Link from 'next/link'
 import type { Product } from '@/lib/types'
 import ImageHoverPreview from '@/components/admin/ImageHoverPreview'
 
-function ProductRow({ product }: { product: Product }) {
+function ProductRow({
+  product,
+  isDragging,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+}: {
+  product: Product
+  isDragging: boolean
+  onDragStart: () => void
+  onDragOver: (e: React.DragEvent) => void
+  onDragEnd: () => void
+}) {
   const [active, setActive] = useState(product.active)
   const [saving, setSaving] = useState(false)
 
@@ -27,7 +39,18 @@ function ProductRow({ product }: { product: Product }) {
     : null
 
   return (
-    <tr className="border-b border-border">
+    <tr onDragOver={onDragOver} className={`border-b border-border ${isDragging ? 'opacity-40' : ''}`}>
+      <td className="w-8 px-2 py-3 align-top">
+        <span
+          draggable
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          title="Drag to reorder"
+          className="block cursor-grab select-none text-sm leading-none text-dim active:cursor-grabbing"
+        >
+          ⠿
+        </span>
+      </td>
       <td className="px-3 py-3 align-top">
         <div className="flex items-center gap-3">
           {primaryImage ? (
@@ -73,27 +96,72 @@ function ProductRow({ product }: { product: Product }) {
 }
 
 export default function ProductTable({ products }: { products: Product[] }) {
-  if (products.length === 0) {
+  const [items, setItems] = useState(products)
+  const [draggedId, setDraggedId] = useState<string | null>(null)
+  const [savingOrder, setSavingOrder] = useState(false)
+
+  function handleDragOver(overId: string) {
+    return (e: React.DragEvent) => {
+      e.preventDefault()
+      if (!draggedId || draggedId === overId) return
+      setItems((prev) => {
+        const draggedIdx = prev.findIndex((p) => p.id === draggedId)
+        const overIdx = prev.findIndex((p) => p.id === overId)
+        if (draggedIdx === -1 || overIdx === -1 || draggedIdx === overIdx) return prev
+        const next = [...prev]
+        const [moved] = next.splice(draggedIdx, 1)
+        next.splice(overIdx, 0, moved)
+        return next
+      })
+    }
+  }
+
+  async function handleDragEnd() {
+    setDraggedId(null)
+    setSavingOrder(true)
+    await fetch('/api/admin/products/reorder', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderedIds: items.map((p) => p.id) }),
+    })
+    setSavingOrder(false)
+  }
+
+  if (items.length === 0) {
     return <p className="text-sm text-mid">No products yet — add your first one.</p>
   }
 
   return (
-    <table className="w-full text-left">
-      <thead>
-        <tr className="border-b border-border-2 text-[11px] uppercase tracking-wide text-dim">
-          <th className="px-3 py-2">Product</th>
-          <th className="px-3 py-2">Category</th>
-          <th className="px-3 py-2">Price</th>
-          <th className="px-3 py-2">Stock</th>
-          <th className="px-3 py-2">Status</th>
-          <th className="px-3 py-2"></th>
-        </tr>
-      </thead>
-      <tbody>
-        {products.map((p) => (
-          <ProductRow key={p.id} product={p} />
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <p className="mb-2 text-[11px] text-dim">
+        Drag <span aria-hidden>⠿</span> to reorder — this also sets the display order on the shop page.
+        {savingOrder ? ' Saving…' : ''}
+      </p>
+      <table className="w-full text-left">
+        <thead>
+          <tr className="border-b border-border-2 text-[11px] uppercase tracking-wide text-dim">
+            <th className="px-2 py-2"></th>
+            <th className="px-3 py-2">Product</th>
+            <th className="px-3 py-2">Category</th>
+            <th className="px-3 py-2">Price</th>
+            <th className="px-3 py-2">Stock</th>
+            <th className="px-3 py-2">Status</th>
+            <th className="px-3 py-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((p) => (
+            <ProductRow
+              key={p.id}
+              product={p}
+              isDragging={draggedId === p.id}
+              onDragStart={() => setDraggedId(p.id)}
+              onDragOver={handleDragOver(p.id)}
+              onDragEnd={handleDragEnd}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
