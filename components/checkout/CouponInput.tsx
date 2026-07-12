@@ -56,7 +56,7 @@ export default function CouponInput({
           type="text"
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
-          placeholder="e.g. AMENTUM10"
+          placeholder="Enter coupon code"
           className="flex-1 rounded-lg border border-border-2 bg-off px-3 py-2.5 text-sm uppercase outline-none focus:border-ink focus:bg-w"
         />
         <button
