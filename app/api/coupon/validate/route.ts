@@ -21,6 +21,6 @@ export async function POST(request: Request) {
     .eq('code', parsed.data.code.toUpperCase())
     .maybeSingle()
 
-  const result = evaluateCoupon(data as CouponRow | null, parsed.data.subtotalInr)
+  const result = evaluateCoupon(data as CouponRow | null, parsed.data.items)
   return NextResponse.json(result)
 }

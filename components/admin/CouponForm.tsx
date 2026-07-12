@@ -16,7 +16,15 @@ function localInputToIso(value: string): string | null {
   return new Date(value).toISOString()
 }
 
-export default function CouponForm({ coupon }: { coupon?: Coupon }) {
+type PickerProduct = { id: string; name: string; sku: string; active: boolean }
+
+export default function CouponForm({
+  coupon,
+  products,
+}: {
+  coupon?: Coupon
+  products: PickerProduct[]
+}) {
   const router = useRouter()
   const isEdit = Boolean(coupon)
 
@@ -29,13 +37,25 @@ export default function CouponForm({ coupon }: { coupon?: Coupon }) {
   const [minOrderAmount, setMinOrderAmount] = useState<number | ''>(coupon?.min_order_amount ?? '')
   const [startsAt, setStartsAt] = useState(isoToLocalInput(coupon?.starts_at ?? null))
   const [expiresAt, setExpiresAt] = useState(isoToLocalInput(coupon?.expires_at ?? null))
+  const [allProducts, setAllProducts] = useState(!coupon?.eligible_product_ids?.length)
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>(coupon?.eligible_product_ids ?? [])
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
+  function toggleProduct(id: string) {
+    setSelectedProductIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSaving(true)
     setError(null)
+
+    if (!allProducts && selectedProductIds.length === 0) {
+      setError('Select at least one product, or choose All Products.')
+      return
+    }
+
+    setSaving(true)
 
     const payload = {
       code: code.trim(),
@@ -47,6 +67,7 @@ export default function CouponForm({ coupon }: { coupon?: Coupon }) {
       min_order_amount: minOrderAmount === '' ? null : Number(minOrderAmount),
       starts_at: localInputToIso(startsAt),
       expires_at: localInputToIso(expiresAt),
+      eligible_product_ids: allProducts ? null : selectedProductIds,
     }
 
     const res = await fetch('/api/admin/coupons', {
@@ -125,6 +146,38 @@ export default function CouponForm({ coupon }: { coupon?: Coupon }) {
           placeholder="Shown nowhere customer-facing — internal note"
           className="w-full rounded-lg border border-border-2 bg-off px-3 py-2.5 text-sm outline-none focus:border-ink focus:bg-w"
         />
+      </div>
+      <div>
+        <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-dim">
+          Applies To
+        </label>
+        <label className="flex items-center gap-2 text-xs text-mid">
+          <input
+            type="checkbox"
+            checked={allProducts}
+            onChange={(e) => setAllProducts(e.target.checked)}
+          />
+          All Products
+        </label>
+        {!allProducts ? (
+          <div className="mt-2 max-h-56 space-y-1.5 overflow-y-auto rounded-lg border border-border-2 bg-off p-3">
+            {products.length === 0 ? (
+              <p className="text-xs text-dim">No products available.</p>
+            ) : (
+              products.map((p) => (
+                <label key={p.id} className="flex items-center gap-2 text-xs text-mid">
+                  <input
+                    type="checkbox"
+                    checked={selectedProductIds.includes(p.id)}
+                    onChange={() => toggleProduct(p.id)}
+                  />
+                  {p.name} ({p.sku})
+                  {!p.active ? <span className="text-dim"> — inactive</span> : null}
+                </label>
+              ))
+            )}
+          </div>
+        ) : null}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>

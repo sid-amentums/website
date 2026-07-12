@@ -75,7 +75,7 @@ export async function POST(request: Request) {
       .eq('code', input.couponCode.toUpperCase())
       .maybeSingle()
 
-    const result = evaluateCoupon(coupon as CouponRow | null, subtotalInr)
+    const result = evaluateCoupon(coupon as CouponRow | null, orderItems)
     if (!result.valid) {
       return NextResponse.json({ error: result.message }, { status: 400 })
     }

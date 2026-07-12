@@ -32,6 +32,7 @@ function CouponRow({ coupon }: { coupon: Coupon }) {
         min_order_amount: coupon.min_order_amount,
         starts_at: coupon.starts_at,
         expires_at: coupon.expires_at,
+        eligible_product_ids: coupon.eligible_product_ids,
       }),
     })
     setSaving(false)
@@ -55,6 +56,9 @@ function CouponRow({ coupon }: { coupon: Coupon }) {
         {coupon.usage_count} / {coupon.max_uses ?? '∞'}
       </td>
       <td className="px-3 py-3 align-top text-xs text-mid">{formatWindow(coupon)}</td>
+      <td className="px-3 py-3 align-top text-xs text-mid">
+        {coupon.eligible_product_ids?.length ? `${coupon.eligible_product_ids.length} product(s)` : 'All products'}
+      </td>
       <td className="px-3 py-3 align-top">
         <div className="flex items-center gap-3">
           <Link href={`/admin/coupons/${coupon.code}/edit`} className="text-xs font-medium text-ink hover:text-red">
@@ -87,6 +91,7 @@ export default function CouponTable({ coupons }: { coupons: Coupon[] }) {
           <th className="px-3 py-2">Status</th>
           <th className="px-3 py-2">Usage</th>
           <th className="px-3 py-2">Window</th>
+          <th className="px-3 py-2">Scope</th>
           <th className="px-3 py-2"></th>
         </tr>
       </thead>

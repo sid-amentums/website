@@ -178,7 +178,7 @@ export default function CheckoutForm({ isGuestCheckout }: { isGuestCheckout: boo
         </div>
 
         <CouponInput
-          subtotalInr={subtotal}
+          items={items}
           applied={appliedCoupon}
           onApply={setAppliedCoupon}
           onClear={() => setAppliedCoupon(null)}

@@ -1,16 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import type { CartItem } from '@/lib/types'
 
 export type AppliedCoupon = { code: string; discountInr: number; label: string }
 
 export default function CouponInput({
-  subtotalInr,
+  items,
   applied,
   onApply,
   onClear,
 }: {
-  subtotalInr: number
+  items: CartItem[]
   applied: AppliedCoupon | null
   onApply: (coupon: AppliedCoupon) => void
   onClear: () => void
@@ -28,7 +29,14 @@ export default function CouponInput({
       const res = await fetch('/api/coupon/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim(), subtotalInr }),
+        body: JSON.stringify({
+          code: code.trim(),
+          items: items.map((i) => ({
+            product_id: i.product_id,
+            unit_price_snapshot: i.unit_price_snapshot,
+            quantity: i.quantity,
+          })),
+        }),
       })
       const result = await res.json()
 

@@ -2,7 +2,15 @@ import { z } from 'zod'
 
 export const couponValidateSchema = z.object({
   code: z.string().min(1).max(40),
-  subtotalInr: z.number().nonnegative(),
+  items: z
+    .array(
+      z.object({
+        product_id: z.string().uuid(),
+        unit_price_snapshot: z.number().nonnegative(),
+        quantity: z.number().int().positive(),
+      })
+    )
+    .min(1),
 })
 
 // Every column the admin form can write. No .default() on any field — the
@@ -24,6 +32,7 @@ export const couponAdminSchema = z.object({
   min_order_amount: z.number().nonnegative().nullable(),
   starts_at: z.string().datetime().nullable(),
   expires_at: z.string().datetime().nullable(),
+  eligible_product_ids: z.array(z.string().uuid()).nullable(),
 })
 
 export type CouponAdminInput = z.infer<typeof couponAdminSchema>
@@ -38,6 +47,13 @@ export type CouponRow = {
   min_order_amount: number | null
   starts_at: string | null
   expires_at: string | null
+  eligible_product_ids: string[] | null
+}
+
+export type CouponEligibleItem = {
+  product_id: string
+  unit_price_snapshot: number
+  quantity: number
 }
 
 export type CouponCheckResult =
@@ -47,7 +63,10 @@ export type CouponCheckResult =
 // Shared by the read-only preview route (app/api/coupon/validate) and the
 // real order-create route — both must reject the same set of conditions so
 // the preview never promises a discount the order-create route won't honor.
-export function evaluateCoupon(coupon: CouponRow | null, subtotalInr: number): CouponCheckResult {
+// Takes cart items (not a pre-summed subtotal) so a coupon restricted to
+// specific products can compute its discount from only the eligible line
+// items, not the whole cart.
+export function evaluateCoupon(coupon: CouponRow | null, items: CouponEligibleItem[]): CouponCheckResult {
   if (!coupon || !coupon.active) {
     return { valid: false, message: 'Invalid or inactive coupon code.' }
   }
@@ -62,7 +81,19 @@ export function evaluateCoupon(coupon: CouponRow | null, subtotalInr: number): C
   if (coupon.max_uses !== null && coupon.usage_count >= coupon.max_uses) {
     return { valid: false, message: 'This coupon has reached its usage limit.' }
   }
-  if (coupon.min_order_amount && subtotalInr < coupon.min_order_amount) {
+
+  const restricted = Boolean(coupon.eligible_product_ids && coupon.eligible_product_ids.length > 0)
+  const eligibleItems = restricted
+    ? items.filter((i) => coupon.eligible_product_ids!.includes(i.product_id))
+    : items
+
+  if (restricted && eligibleItems.length === 0) {
+    return { valid: false, message: 'This coupon does not apply to any items in your cart.' }
+  }
+
+  const eligibleSubtotalInr = eligibleItems.reduce((sum, i) => sum + i.unit_price_snapshot * i.quantity, 0)
+
+  if (coupon.min_order_amount && eligibleSubtotalInr < coupon.min_order_amount) {
     return {
       valid: false,
       message: `Minimum order amount for this coupon is ₹${coupon.min_order_amount.toLocaleString('en-IN')}.`,
@@ -71,8 +102,8 @@ export function evaluateCoupon(coupon: CouponRow | null, subtotalInr: number): C
 
   const discountInr =
     coupon.type === 'percent'
-      ? Math.round((subtotalInr * coupon.value) / 100)
-      : Math.min(coupon.value, subtotalInr)
+      ? Math.round((eligibleSubtotalInr * coupon.value) / 100)
+      : Math.min(coupon.value, eligibleSubtotalInr)
 
   const label =
     coupon.type === 'percent' ? `${coupon.value}% off` : `₹${coupon.value.toLocaleString('en-IN')} off`

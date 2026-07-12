@@ -82,6 +82,7 @@ export type Coupon = {
   starts_at: string | null
   expires_at: string | null
   created_at: string
+  eligible_product_ids: string[] | null
 }
 
 export type Order = {

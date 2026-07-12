@@ -20,12 +20,17 @@ export default async function EditCouponPage({ params }: { params: { code: strin
 
   if (!data) notFound()
 
+  const { data: products } = await supabase
+    .from('products')
+    .select('id, name, sku, active')
+    .order('name', { ascending: true })
+
   return (
     <div>
       <AdminNav />
       <div className="mx-auto max-w-xl px-6 py-10">
         <h1 className="mb-6 font-serif text-2xl text-ink">Edit Coupon</h1>
-        <CouponForm coupon={data as Coupon} />
+        <CouponForm coupon={data as Coupon} products={products ?? []} />
       </div>
     </div>
   )
