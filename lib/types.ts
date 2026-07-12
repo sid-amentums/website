@@ -70,6 +70,20 @@ export type Article = {
   created_at: string
 }
 
+export type Coupon = {
+  code: string
+  type: 'percent' | 'flat'
+  value: number
+  description: string | null
+  active: boolean
+  usage_count: number
+  max_uses: number | null
+  min_order_amount: number | null
+  starts_at: string | null
+  expires_at: string | null
+  created_at: string
+}
+
 export type Order = {
   id: string
   user_id: string | null

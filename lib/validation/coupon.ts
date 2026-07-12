@@ -5,6 +5,29 @@ export const couponValidateSchema = z.object({
   subtotalInr: z.number().nonnegative(),
 })
 
+// Every column the admin form can write. No .default() on any field — the
+// admin POST route upserts by `code`, so a value silently defaulting on an
+// omitted key would corrupt an edit the same way it did for products
+// (see lib/validation/product.ts). CouponForm always sends every field.
+export const couponAdminSchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1)
+    .max(40)
+    .regex(/^[A-Za-z0-9_-]+$/, 'Code must be letters, numbers, hyphens, or underscores only'),
+  type: z.enum(['percent', 'flat']),
+  value: z.number().positive(),
+  description: z.string().trim().max(300).nullable(),
+  active: z.boolean(),
+  max_uses: z.number().int().positive().nullable(),
+  min_order_amount: z.number().nonnegative().nullable(),
+  starts_at: z.string().datetime().nullable(),
+  expires_at: z.string().datetime().nullable(),
+})
+
+export type CouponAdminInput = z.infer<typeof couponAdminSchema>
+
 export type CouponRow = {
   code: string
   type: 'percent' | 'flat'
