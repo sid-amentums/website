@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getVaultSecret } from '@/lib/razorpay/getKeySecret'
 import { verifyRazorpaySignature } from '@/lib/razorpay/signature'
+import { sendOrderConfirmationWhatsApp } from '@/lib/whatsapp/sendMessage'
+import { syncMailchimpSubscriber } from '@/lib/mailchimp/syncSubscriber'
 
 const verifySchema = z.object({
   razorpay_order_id: z.string().min(1),
@@ -28,7 +30,7 @@ export async function POST(request: Request) {
 
   const { data: order } = await admin
     .from('orders')
-    .select('id, razorpay_order_id, status, coupon_code')
+    .select('id, razorpay_order_id, status, coupon_code, contact_name, contact_phone, contact_email, amount_inr')
     .eq('id', order_db_id)
     .maybeSingle()
 
@@ -86,6 +88,20 @@ export async function POST(request: Request) {
       () => {} // non-fatal if the RPC is missing/fails — payment is already verified and recorded
     )
   }
+
+  // Both silently no-op if unconfigured and never throw — see
+  // lib/whatsapp/sendMessage.ts / lib/mailchimp/syncSubscriber.ts. Payment
+  // is already verified and recorded above; these must never affect the
+  // response.
+  await Promise.all([
+    sendOrderConfirmationWhatsApp({
+      contactName: order.contact_name,
+      contactPhone: order.contact_phone,
+      orderId: order.id,
+      amountInr: order.amount_inr,
+    }),
+    syncMailchimpSubscriber(order.contact_email, order.contact_name),
+  ])
 
   return NextResponse.json({ ok: true, order_id: order.id })
 }
