@@ -10,6 +10,8 @@ type PublicSettings = {
   whatsappBusinessAccountId: string
   whatsappTemplateName: string
   mailchimpAudienceId: string
+  orderNotificationEmails: string
+  orderNotificationFromEmail: string
 }
 
 type SecretName =
@@ -17,6 +19,7 @@ type SecretName =
   | 'razorpay_webhook_secret'
   | 'whatsapp_access_token'
   | 'mailchimp_api_key'
+  | 'resend_api_key'
 
 function SecretField({
   label,
@@ -76,6 +79,8 @@ export default function SettingsForm({ initial }: { initial: PublicSettings }) {
   const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState(initial.whatsappBusinessAccountId)
   const [whatsappTemplateName, setWhatsappTemplateName] = useState(initial.whatsappTemplateName)
   const [mailchimpAudienceId, setMailchimpAudienceId] = useState(initial.mailchimpAudienceId)
+  const [orderNotificationEmails, setOrderNotificationEmails] = useState(initial.orderNotificationEmails)
+  const [orderNotificationFromEmail, setOrderNotificationFromEmail] = useState(initial.orderNotificationFromEmail)
   const [publicMsg, setPublicMsg] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -94,6 +99,8 @@ export default function SettingsForm({ initial }: { initial: PublicSettings }) {
         whatsapp_business_account_id: whatsappBusinessAccountId,
         whatsapp_template_name: whatsappTemplateName,
         mailchimp_audience_id: mailchimpAudienceId,
+        order_notification_emails: orderNotificationEmails,
+        order_notification_from_email: orderNotificationFromEmail,
       }),
     })
     setSaving(false)
@@ -187,6 +194,32 @@ export default function SettingsForm({ initial }: { initial: PublicSettings }) {
           />
         </div>
 
+        <h2 className="pt-3 text-sm font-medium text-ink">Order Notifications</h2>
+        <div>
+          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-dim">
+            Recipient Email(s)
+          </label>
+          <input
+            value={orderNotificationEmails}
+            onChange={(e) => setOrderNotificationEmails(e.target.value)}
+            placeholder="e.g. info@amentums.com, orders@amentums.com"
+            className="w-full rounded-lg border border-border-2 bg-off px-3 py-2.5 text-sm outline-none focus:border-ink focus:bg-w"
+          />
+          <p className="mt-1 text-[11px] text-dim">Comma-separated — sent an email for every successful order.</p>
+        </div>
+        <div>
+          <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-dim">
+            From Address
+          </label>
+          <input
+            value={orderNotificationFromEmail}
+            onChange={(e) => setOrderNotificationFromEmail(e.target.value)}
+            placeholder="orders@yourdomain.com"
+            className="w-full rounded-lg border border-border-2 bg-off px-3 py-2.5 text-sm outline-none focus:border-ink focus:bg-w"
+          />
+          <p className="mt-1 text-[11px] text-dim">Must be a verified sender domain in your Resend account.</p>
+        </div>
+
         {publicMsg ? <p className="text-xs text-mid">{publicMsg}</p> : null}
         <button
           type="submit"
@@ -216,6 +249,11 @@ export default function SettingsForm({ initial }: { initial: PublicSettings }) {
         label="Mailchimp API Key"
         hint="Used to sync customers to your Mailchimp audience after checkout."
         name="mailchimp_api_key"
+      />
+      <SecretField
+        label="Resend API Key"
+        hint="From resend.com — required to send order notification emails."
+        name="resend_api_key"
       />
     </div>
   )

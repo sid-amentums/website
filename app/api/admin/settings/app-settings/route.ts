@@ -11,6 +11,8 @@ const schema = z.object({
   whatsapp_business_account_id: z.string().optional(),
   whatsapp_template_name: z.string().optional(),
   mailchimp_audience_id: z.string().optional(),
+  order_notification_emails: z.string().optional(),
+  order_notification_from_email: z.string().optional(),
 })
 
 // RLS's app_settings_update_admin_only policy already permits this via the

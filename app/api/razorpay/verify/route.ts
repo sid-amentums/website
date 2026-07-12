@@ -5,6 +5,7 @@ import { getVaultSecret } from '@/lib/razorpay/getKeySecret'
 import { verifyRazorpaySignature } from '@/lib/razorpay/signature'
 import { sendOrderConfirmationWhatsApp } from '@/lib/whatsapp/sendMessage'
 import { syncMailchimpSubscriber } from '@/lib/mailchimp/syncSubscriber'
+import { sendOrderNotificationEmail } from '@/lib/resend/sendOrderNotification'
 
 const verifySchema = z.object({
   razorpay_order_id: z.string().min(1),
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
 
   const { data: order } = await admin
     .from('orders')
-    .select('id, razorpay_order_id, status, coupon_code, contact_name, contact_phone, contact_email, amount_inr')
+    .select(
+      'id, razorpay_order_id, status, coupon_code, contact_name, contact_phone, contact_email, amount_inr, shipping_address, items'
+    )
     .eq('id', order_db_id)
     .maybeSingle()
 
@@ -67,13 +70,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Signature verification failed' }, { status: 400 })
   }
 
+  const paidAt = new Date().toISOString()
+
   const { error: updateError } = await admin
     .from('orders')
     .update({
       status: 'paid',
       razorpay_payment_id,
       razorpay_signature,
-      paid_at: new Date().toISOString(),
+      paid_at: paidAt,
     })
     .eq('id', order_db_id)
     .eq('status', 'created') // guards against a race with a concurrent verify call
@@ -89,10 +94,10 @@ export async function POST(request: Request) {
     )
   }
 
-  // Both silently no-op if unconfigured and never throw — see
-  // lib/whatsapp/sendMessage.ts / lib/mailchimp/syncSubscriber.ts. Payment
-  // is already verified and recorded above; these must never affect the
-  // response.
+  // All three silently no-op if unconfigured and never throw — see
+  // lib/whatsapp/sendMessage.ts / lib/mailchimp/syncSubscriber.ts /
+  // lib/resend/sendOrderNotification.ts. Payment is already verified and
+  // recorded above; these must never affect the response.
   await Promise.all([
     sendOrderConfirmationWhatsApp({
       contactName: order.contact_name,
@@ -101,6 +106,17 @@ export async function POST(request: Request) {
       amountInr: order.amount_inr,
     }),
     syncMailchimpSubscriber(order.contact_email, order.contact_name),
+    sendOrderNotificationEmail({
+      orderId: order.id,
+      contactName: order.contact_name,
+      contactPhone: order.contact_phone,
+      contactEmail: order.contact_email,
+      shippingAddress: order.shipping_address,
+      items: order.items,
+      amountInr: order.amount_inr,
+      createdAt: paidAt,
+      razorpayPaymentId: razorpay_payment_id,
+    }),
   ])
 
   return NextResponse.json({ ok: true, order_id: order.id })

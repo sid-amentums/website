@@ -12,7 +12,7 @@ export default async function AdminSettingsPage() {
   const { data: settings } = await supabase
     .from('app_settings')
     .select(
-      'razorpay_key_id, ga_measurement_id, meta_pixel_id, whatsapp_phone_number_id, whatsapp_business_account_id, whatsapp_template_name, mailchimp_audience_id'
+      'razorpay_key_id, ga_measurement_id, meta_pixel_id, whatsapp_phone_number_id, whatsapp_business_account_id, whatsapp_template_name, mailchimp_audience_id, order_notification_emails, order_notification_from_email'
     )
     .eq('id', 1)
     .single()
@@ -31,6 +31,8 @@ export default async function AdminSettingsPage() {
             whatsappBusinessAccountId: settings?.whatsapp_business_account_id ?? '',
             whatsappTemplateName: settings?.whatsapp_template_name ?? '',
             mailchimpAudienceId: settings?.mailchimp_audience_id ?? '',
+            orderNotificationEmails: settings?.order_notification_emails ?? '',
+            orderNotificationFromEmail: settings?.order_notification_from_email ?? '',
           }}
         />
       </div>

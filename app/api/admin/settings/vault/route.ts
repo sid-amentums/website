@@ -9,6 +9,7 @@ const schema = z.object({
     'razorpay_webhook_secret',
     'whatsapp_access_token',
     'mailchimp_api_key',
+    'resend_api_key',
   ]),
   secretValue: z.string().min(1),
 })

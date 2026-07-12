@@ -6,7 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 // reads at call time via the service_role-only get_vault_secret RPC, never
 // cached, never logged, never returned in a response.
 export async function getVaultSecret(
-  name: 'whatsapp_access_token' | 'mailchimp_api_key'
+  name: 'whatsapp_access_token' | 'mailchimp_api_key' | 'resend_api_key'
 ): Promise<string | null> {
   const admin = createAdminClient()
   const { data, error } = await admin.rpc('get_vault_secret', { p_secret_name: name })
