@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import NavCartButton from '@/components/cart/NavCartButton'
+import NavAuthButton from '@/components/layout/NavAuthButton'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function Nav() {
@@ -34,6 +35,11 @@ export default async function Nav() {
             Insights
           </Link>
         </li>
+        <li>
+          <Link href="/track-order" className="text-xs text-mid transition-colors hover:text-ink">
+            Track Order
+          </Link>
+        </li>
         {user ? (
           <li>
             <Link
@@ -47,6 +53,7 @@ export default async function Nav() {
       </ul>
 
       <div className="flex items-center gap-4">
+        <NavAuthButton isLoggedIn={Boolean(user)} />
         <NavCartButton />
         <Link
           href="/shop"

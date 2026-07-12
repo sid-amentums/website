@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { CartItem } from '@/lib/types'
 import PurchasePixelEvent from '@/components/checkout/PurchasePixelEvent'
+import CopyOrderId from '@/components/checkout/CopyOrderId'
 
 export const revalidate = 0
 
@@ -77,13 +78,19 @@ export default async function CheckoutSuccessPage({
         ))}
       </div>
 
-      <div className="mb-8 flex justify-between rounded-lg bg-off px-4 py-3.5 text-sm">
+      <div className="mb-6 flex justify-between rounded-lg bg-off px-4 py-3.5 text-sm">
         <span className="text-mid">Total Paid</span>
         <span className="font-medium text-ink">₹{order.amount_inr.toLocaleString('en-IN')}</span>
       </div>
 
+      <CopyOrderId orderId={order.id} />
+
       <p className="mb-8 text-xs text-dim">
-        Shipping and tracking details will appear on your order page once your order has shipped.
+        Save your Order ID above — use it with your phone number on the{' '}
+        <Link href="/track-order" className="text-ink underline">
+          Track My Order
+        </Link>{' '}
+        page to check shipping status anytime.
       </p>
 
       <Link
