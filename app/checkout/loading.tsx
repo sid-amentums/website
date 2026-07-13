@@ -1,9 +1,9 @@
-import JavelinLoader from '@/components/ui/JavelinLoader'
+import LoadingFlag from '@/components/ui/LoadingFlag'
 
 export default function CheckoutLoading() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-w">
-      <JavelinLoader label="Loading checkout" />
+      <LoadingFlag label="Loading checkout" />
     </div>
   )
 }
