@@ -22,8 +22,8 @@ export default function LoadingFlag({
   className?: string
 }) {
   return (
-    <div className={`flex flex-col items-center justify-center gap-6 ${className}`}>
-      <svg viewBox="0 0 320 220" className="h-56 w-80 md:h-64 md:w-96">
+    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+      <svg viewBox="0 0 320 220" className="h-16 w-24">
         <rect x="14" y="4" width="6" height="212" rx="3" fill="#0a0a0a" />
 
         <g className="origin-left animate-flag-wave">
