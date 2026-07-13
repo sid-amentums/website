@@ -13,7 +13,13 @@ export default async function AdminProductsPage() {
   if (!admin) redirect('/admin/login')
 
   const supabase = createClient()
-  const { data } = await supabase.from('products').select('*').order('sort_order', { ascending: true })
+  const [{ data }, { data: bestSellerRows }] = await Promise.all([
+    supabase.from('products').select('*').order('sort_order', { ascending: true }),
+    supabase.rpc('public_best_seller_ids', { p_limit: 3 }),
+  ])
+  const bestSellerIds = new Set(
+    ((bestSellerRows ?? []) as { product_id: string }[]).map((r) => r.product_id)
+  )
 
   return (
     <div>
@@ -28,7 +34,7 @@ export default async function AdminProductsPage() {
             New Product
           </Link>
         </div>
-        <ProductTable products={(data ?? []) as Product[]} />
+        <ProductTable products={(data ?? []) as Product[]} bestSellerIds={bestSellerIds} />
       </div>
     </div>
   )

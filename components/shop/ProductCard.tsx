@@ -6,21 +6,25 @@ import Image from 'next/image'
 import type { Product } from '@/lib/types'
 import VariantSelect from '@/components/shop/VariantSelect'
 import AddToCartButton from '@/components/shop/AddToCartButton'
+import { isSaleActive, getEffectivePrice } from '@/lib/pricing/sale'
 
 const WHATSAPP_NUMBER = '+919827654830'
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, isBestSeller }: { product: Product; isBestSeller: boolean }) {
   const activeVariants = product.variants.filter((v) => v.active)
   const [variantId, setVariantId] = useState(activeVariants[0]?.id ?? '')
   const selectedVariant = activeVariants.find((v) => v.id === variantId) ?? activeVariants[0]
   const primaryImage =
     product.images.find((img) => img.is_primary) ?? product.images[0] ?? null
 
-  const priceLabel = !selectedVariant
-    ? null
-    : activeVariants.length > 1
-      ? `from ₹${Math.min(...activeVariants.map((v) => v.price_inr)).toLocaleString('en-IN')}`
-      : `₹${selectedVariant.price_inr.toLocaleString('en-IN')}`
+  const onSale = isSaleActive(product)
+  const basePrice = activeVariants.length > 1 ? Math.min(...activeVariants.map((v) => v.price_inr)) : selectedVariant?.price_inr ?? null
+  const pricePrefix = activeVariants.length > 1 ? 'from ' : ''
+  const priceLabel = basePrice === null ? null : `${pricePrefix}₹${basePrice.toLocaleString('en-IN')}`
+  const salePriceLabel =
+    onSale && basePrice !== null
+      ? `${pricePrefix}₹${getEffectivePrice(basePrice, product.sale_percent).toLocaleString('en-IN')}`
+      : null
 
   return (
     <div className="flex flex-col overflow-hidden bg-w transition-colors hover:bg-off">
@@ -50,6 +54,16 @@ export default function ProductCard({ product }: { product: Product }) {
               WA Certified
             </span>
           ) : null}
+          {isBestSeller ? (
+            <span className="rounded-md bg-[#c8a227] px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+              Best Seller
+            </span>
+          ) : null}
+          {onSale ? (
+            <span className="rounded-md bg-red px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+              On Sale
+            </span>
+          ) : null}
         </div>
         <Link href={`/shop/${product.slug}`}>
           <h3 className="mb-1.5 font-serif text-xl leading-tight text-ink">{product.name}</h3>
@@ -64,7 +78,16 @@ export default function ProductCard({ product }: { product: Product }) {
           <>
             <VariantSelect variants={activeVariants} value={variantId} onChange={setVariantId} />
             <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
-              <span className="text-lg font-medium text-ink">{priceLabel}</span>
+              <span className="flex items-baseline gap-1.5">
+                {salePriceLabel ? (
+                  <>
+                    <span className="text-lg font-medium text-red">{salePriceLabel}</span>
+                    <span className="text-xs text-dim line-through">{priceLabel}</span>
+                  </>
+                ) : (
+                  <span className="text-lg font-medium text-ink">{priceLabel}</span>
+                )}
+              </span>
               <AddToCartButton product={product} variant={selectedVariant} />
             </div>
           </>

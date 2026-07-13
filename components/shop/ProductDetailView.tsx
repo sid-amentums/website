@@ -6,11 +6,13 @@ import type { Product } from '@/lib/types'
 import VariantSelect from '@/components/shop/VariantSelect'
 import AddToCartButton from '@/components/shop/AddToCartButton'
 import { trackPixelEvent } from '@/lib/analytics/metaPixel'
+import { isSaleActive, getEffectivePrice } from '@/lib/pricing/sale'
 
 const WHATSAPP_NUMBER = '+919827654830'
 
-export default function ProductDetailView({ product }: { product: Product }) {
+export default function ProductDetailView({ product, isBestSeller }: { product: Product; isBestSeller: boolean }) {
   const activeVariants = product.variants.filter((v) => v.active)
+  const onSale = isSaleActive(product)
 
   useEffect(() => {
     trackPixelEvent('ViewContent', {
@@ -70,6 +72,16 @@ export default function ProductDetailView({ product }: { product: Product }) {
               WA Certified
             </span>
           ) : null}
+          {isBestSeller ? (
+            <span className="rounded-md bg-[#c8a227] px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+              Best Seller
+            </span>
+          ) : null}
+          {onSale ? (
+            <span className="rounded-md bg-red px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+              On Sale
+            </span>
+          ) : null}
         </div>
         <h1 className="mb-4 font-serif text-4xl leading-tight text-ink">{product.name}</h1>
         {product.long_desc || product.short_desc ? (
@@ -99,8 +111,21 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <>
             <VariantSelect variants={activeVariants} value={variantId} onChange={setVariantId} />
             <div className="mt-6 flex items-center justify-between gap-4">
-              <span className="font-serif text-3xl text-ink">
-                ₹{selectedVariant.price_inr.toLocaleString('en-IN')}
+              <span className="flex items-baseline gap-2">
+                {onSale ? (
+                  <>
+                    <span className="font-serif text-3xl text-red">
+                      ₹{getEffectivePrice(selectedVariant.price_inr, product.sale_percent).toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-base text-dim line-through">
+                      ₹{selectedVariant.price_inr.toLocaleString('en-IN')}
+                    </span>
+                  </>
+                ) : (
+                  <span className="font-serif text-3xl text-ink">
+                    ₹{selectedVariant.price_inr.toLocaleString('en-IN')}
+                  </span>
+                )}
               </span>
               <AddToCartButton
                 product={product}

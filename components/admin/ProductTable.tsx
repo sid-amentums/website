@@ -4,15 +4,18 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Product } from '@/lib/types'
 import ImageHoverPreview from '@/components/admin/ImageHoverPreview'
+import { isSaleActive } from '@/lib/pricing/sale'
 
 function ProductRow({
   product,
+  isBestSeller,
   isDragging,
   onDragStart,
   onDragOver,
   onDragEnd,
 }: {
   product: Product
+  isBestSeller: boolean
   isDragging: boolean
   onDragStart: () => void
   onDragOver: (e: React.DragEvent) => void
@@ -62,7 +65,19 @@ function ProductRow({
             <div className="h-10 w-10 rounded bg-off" />
           )}
           <div>
-            <div className="text-sm font-medium text-ink">{product.name}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-medium text-ink">{product.name}</span>
+              {isBestSeller ? (
+                <span className="rounded-md bg-[#c8a227] px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+                  Best Seller
+                </span>
+              ) : null}
+              {isSaleActive(product) ? (
+                <span className="rounded-md bg-red px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
+                  On Sale
+                </span>
+              ) : null}
+            </div>
             <div className="text-xs text-dim">{product.sku}</div>
           </div>
         </div>
@@ -95,7 +110,13 @@ function ProductRow({
   )
 }
 
-export default function ProductTable({ products }: { products: Product[] }) {
+export default function ProductTable({
+  products,
+  bestSellerIds,
+}: {
+  products: Product[]
+  bestSellerIds: Set<string>
+}) {
   const [items, setItems] = useState(products)
   const [draggedId, setDraggedId] = useState<string | null>(null)
   const [savingOrder, setSavingOrder] = useState(false)
@@ -154,6 +175,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
             <ProductRow
               key={p.id}
               product={p}
+              isBestSeller={p.featured_best_seller || bestSellerIds.has(p.id)}
               isDragging={draggedId === p.id}
               onDragStart={() => setDraggedId(p.id)}
               onDragOver={handleDragOver(p.id)}

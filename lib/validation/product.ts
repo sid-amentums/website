@@ -10,7 +10,11 @@ export const productVariantSchema = z.object({
 })
 
 export const productImageSchema = z.object({
-  url: z.string().url(),
+  // Not .url() — legacy seeded products reference local /images/products/...
+  // paths (served straight from /public), while uploads via the Storage
+  // route produce full https:// URLs. Both render fine through next/image
+  // and plain <img>, so any non-empty path is accepted here.
+  url: z.string().trim().min(1),
   alt: z.string().trim().max(160),
   is_primary: z.boolean(),
   sort_order: z.number().int().nonnegative(),
@@ -43,6 +47,10 @@ export const productSchema = z.object({
   stock: z.number().int().nonnegative(),
   checkout_enabled: z.boolean(),
   whatsapp_message_template: z.string().trim().max(500).nullable().optional(),
+  featured_best_seller: z.boolean(),
+  sale_percent: z.number().int().min(1).max(99).nullable().optional(),
+  sale_starts_at: z.string().nullable().optional(),
+  sale_ends_at: z.string().nullable().optional(),
 })
 
 export type ProductInput = z.infer<typeof productSchema>

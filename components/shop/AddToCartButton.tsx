@@ -3,6 +3,7 @@
 import type { Product, ProductVariant } from '@/lib/types'
 import { useCartStore } from '@/lib/cart/store'
 import { trackPixelEvent } from '@/lib/analytics/metaPixel'
+import { isSaleActive, getEffectivePrice } from '@/lib/pricing/sale'
 
 export default function AddToCartButton({
   product,
@@ -18,19 +19,24 @@ export default function AddToCartButton({
   return (
     <button
       onClick={() => {
+        // Cosmetic snapshot only, for cart/checkout preview display — the
+        // Razorpay order-create route always recomputes price server-side
+        // from the product's live sale fields, this just keeps the preview
+        // from looking "wrong" (full price) while a sale is active.
+        const unitPrice = isSaleActive(product) ? getEffectivePrice(variant.price_inr, product.sale_percent) : variant.price_inr
         addItem({
           product_id: product.id,
           variant_id: variant.id,
           name_snapshot: product.name,
           variant_label_snapshot: variant.label,
-          unit_price_snapshot: variant.price_inr,
+          unit_price_snapshot: unitPrice,
           quantity: 1,
         })
         trackPixelEvent('AddToCart', {
           content_ids: product.id,
           content_name: product.name,
           content_type: 'product',
-          value: variant.price_inr,
+          value: unitPrice,
           currency: 'INR',
         })
       }}

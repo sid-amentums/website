@@ -32,6 +32,10 @@ export type Product = {
   checkout_enabled: boolean
   whatsapp_message_template: string | null
   sort_order: number
+  featured_best_seller: boolean
+  sale_percent: number | null
+  sale_starts_at: string | null
+  sale_ends_at: string | null
 }
 
 export type CartItem = {

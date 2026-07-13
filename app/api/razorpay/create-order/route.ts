@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createOrderSchema } from '@/lib/validation/checkout'
 import { evaluateCoupon, type CouponRow } from '@/lib/validation/coupon'
 import { getRazorpayClient, RazorpayNotConfiguredError } from '@/lib/razorpay/client'
+import { isSaleActive, getEffectivePrice } from '@/lib/pricing/sale'
 import type { CartItem, ProductVariant } from '@/lib/types'
 
 export async function POST(request: Request) {
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
   const productIds = Array.from(new Set(input.items.map((i) => i.product_id)))
   const { data: products } = await admin
     .from('products')
-    .select('id, name, active, checkout_enabled, variants')
+    .select('id, name, active, checkout_enabled, variants, sale_percent, sale_starts_at, sale_ends_at')
     .in('id', productIds)
 
   const orderItems: CartItem[] = []
@@ -54,12 +55,14 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+    const unitPrice = isSaleActive(product) ? getEffectivePrice(variant.price_inr, product.sale_percent) : variant.price_inr
+
     orderItems.push({
       product_id: product.id,
       variant_id: variant.id,
       name_snapshot: product.name,
       variant_label_snapshot: variant.label,
-      unit_price_snapshot: variant.price_inr,
+      unit_price_snapshot: unitPrice,
       quantity: line.quantity,
     })
   }

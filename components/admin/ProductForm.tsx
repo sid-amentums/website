@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Image from 'next/image'
 import type { Product, ProductVariant, ProductImage } from '@/lib/types'
 import ImageHoverPreview from '@/components/admin/ImageHoverPreview'
+import { isSaleActive } from '@/lib/pricing/sale'
 
 function slugify(name: string) {
   return name
@@ -43,6 +45,7 @@ export default function ProductForm({ product }: { product?: Product }) {
   const [active, setActive] = useState(product?.active ?? true)
   const [stock, setStock] = useState(product?.stock ?? 0)
   const [checkoutEnabled, setCheckoutEnabled] = useState(product?.checkout_enabled ?? true)
+  const [featuredBestSeller, setFeaturedBestSeller] = useState(product?.featured_best_seller ?? false)
   const [waTemplate, setWaTemplate] = useState(product?.whatsapp_message_template ?? '')
   const [variants, setVariants] = useState<ProductVariant[]>(
     product?.variants ?? [
@@ -140,6 +143,7 @@ export default function ProductForm({ product }: { product?: Product }) {
       stock,
       checkout_enabled: checkoutEnabled,
       whatsapp_message_template: waTemplate.trim() || null,
+      featured_best_seller: featuredBestSeller,
     }
   }
 
@@ -329,7 +333,31 @@ export default function ProductForm({ product }: { product?: Product }) {
             />
             Checkout enabled (uncheck for WhatsApp-enquiry-only products)
           </label>
+          <label className="flex items-center gap-2 text-xs text-mid">
+            <input
+              type="checkbox"
+              checked={featuredBestSeller}
+              onChange={(e) => setFeaturedBestSeller(e.target.checked)}
+            />
+            Feature as Best Seller (shows the badge regardless of sales rank)
+          </label>
         </div>
+        {isEdit ? (
+          <p className="text-xs text-mid">
+            {isSaleActive(product!) ? (
+              <>
+                On sale: <span className="font-medium text-red">{product!.sale_percent}% off</span> until{' '}
+                {new Date(product!.sale_ends_at!).toLocaleDateString('en-IN')}
+              </>
+            ) : (
+              'No active sale'
+            )}{' '}
+            —{' '}
+            <Link href="/admin/sales" className="underline hover:text-ink">
+              manage in Sales
+            </Link>
+          </p>
+        ) : null}
         {!checkoutEnabled ? (
           <div>
             <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-dim">
