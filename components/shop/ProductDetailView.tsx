@@ -69,7 +69,7 @@ export default function ProductDetailView({ product, isBestSeller }: { product: 
           {product.category}
           {product.wa_certified ? (
             <span className="rounded-md bg-[#25D366] px-1.5 py-0.5 text-[9px] font-semibold uppercase text-w">
-              WA Certified
+              World Athletics Certified
             </span>
           ) : null}
           {isBestSeller ? (
