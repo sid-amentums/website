@@ -25,7 +25,9 @@ export default async function AdminCustomerDetailPage({ params }: { params: { id
 
   const { data: orders } = await supabaseAdmin
     .from('orders')
-    .select('id, created_at, status, items, amount_inr, shipping_status, awb_number')
+    .select(
+      'id, created_at, status, items, amount_inr, shipping_status, awb_number, razorpay_order_id, contact_name, contact_phone, contact_email'
+    )
     .eq('user_id', params.id)
     .order('created_at', { ascending: false })
 

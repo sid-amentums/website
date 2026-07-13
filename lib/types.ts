@@ -95,6 +95,7 @@ export type Order = {
   discount_inr: number
   amount_inr: number
   coupon_code: string | null
+  razorpay_order_id: string | null
   status: OrderStatus
   contact_name: string
   contact_phone: string

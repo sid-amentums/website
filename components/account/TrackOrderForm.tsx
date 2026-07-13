@@ -9,6 +9,7 @@ export default function TrackOrderForm() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [order, setOrder] = useState<OrderCardData | null>(null)
+  const [razorpayKeyId, setRazorpayKeyId] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -29,6 +30,7 @@ export default function TrackOrderForm() {
         return
       }
       setOrder(data.order)
+      setRazorpayKeyId(data.razorpayKeyId ?? null)
     } catch {
       setError('Something went wrong — please try again.')
     } finally {
@@ -82,7 +84,7 @@ export default function TrackOrderForm() {
 
       {order ? (
         <div className="mt-8">
-          <OrderCard order={order} />
+          <OrderCard order={order} razorpayKeyId={razorpayKeyId} allowPaymentResume />
         </div>
       ) : null}
     </div>

@@ -20,16 +20,21 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient()
-  const { data: order } = await admin
-    .from('orders')
-    .select('id, status, amount_inr, items, created_at, shipping_status, awb_number')
-    .eq('id', parsed.data.orderId)
-    .eq('contact_phone', parsed.data.phone)
-    .maybeSingle()
+  const [{ data: order }, { data: settings }] = await Promise.all([
+    admin
+      .from('orders')
+      .select(
+        'id, status, amount_inr, items, created_at, shipping_status, awb_number, razorpay_order_id, contact_name, contact_phone, contact_email'
+      )
+      .eq('id', parsed.data.orderId)
+      .eq('contact_phone', parsed.data.phone)
+      .maybeSingle(),
+    admin.from('app_settings').select('razorpay_key_id').eq('id', 1).single(),
+  ])
 
   if (!order) {
     return NextResponse.json({ error: NOT_FOUND_MESSAGE }, { status: 404 })
   }
 
-  return NextResponse.json({ order })
+  return NextResponse.json({ order, razorpayKeyId: settings?.razorpay_key_id ?? null })
 }

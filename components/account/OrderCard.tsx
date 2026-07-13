@@ -1,4 +1,5 @@
 import type { Order, ShippingStatus } from '@/lib/types'
+import ResumePaymentButton from '@/components/checkout/ResumePaymentButton'
 
 const SHIPPING_LABELS: Record<ShippingStatus, string> = {
   pending: 'Pending',
@@ -18,10 +19,28 @@ const STATUS_LABELS: Record<Order['status'], string> = {
 
 export type OrderCardData = Pick<
   Order,
-  'id' | 'created_at' | 'status' | 'items' | 'amount_inr' | 'shipping_status' | 'awb_number'
+  | 'id'
+  | 'created_at'
+  | 'status'
+  | 'items'
+  | 'amount_inr'
+  | 'shipping_status'
+  | 'awb_number'
+  | 'razorpay_order_id'
+  | 'contact_name'
+  | 'contact_phone'
+  | 'contact_email'
 >
 
-export default function OrderCard({ order }: { order: OrderCardData }) {
+export default function OrderCard({
+  order,
+  razorpayKeyId,
+  allowPaymentResume = false,
+}: {
+  order: OrderCardData
+  razorpayKeyId?: string | null
+  allowPaymentResume?: boolean
+}) {
   return (
     <div className="rounded-lg border border-border p-5">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
@@ -95,6 +114,23 @@ export default function OrderCard({ order }: { order: OrderCardData }) {
               Track on DTDC ↗
             </a>
           ) : null}
+        </div>
+      ) : null}
+
+      {order.status === 'created' && allowPaymentResume && order.razorpay_order_id && razorpayKeyId ? (
+        <div className="rounded-lg bg-off px-4 py-3">
+          <p className="mb-2 text-xs text-mid">
+            This order is still awaiting payment — complete it to confirm your purchase.
+          </p>
+          <ResumePaymentButton
+            orderId={order.id}
+            razorpayOrderId={order.razorpay_order_id}
+            amountInr={order.amount_inr}
+            keyId={razorpayKeyId}
+            contactName={order.contact_name}
+            contactPhone={order.contact_phone}
+            contactEmail={order.contact_email}
+          />
         </div>
       ) : null}
     </div>
