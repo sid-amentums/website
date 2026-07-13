@@ -45,10 +45,18 @@ const config: Config = {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        javelinFly: {
+          '0%': { transform: 'translate(-42px, 12px) rotate(-18deg)', opacity: '0' },
+          '15%': { opacity: '1' },
+          '50%': { transform: 'translate(0, -16px) rotate(-38deg)', opacity: '1' },
+          '85%': { opacity: '1' },
+          '100%': { transform: 'translate(42px, -32px) rotate(-54deg)', opacity: '0' },
+        },
       },
       animation: {
         fall: 'fall 2s cubic-bezier(0.16, 1, 0.3, 1) infinite',
         roll: 'roll 30s linear infinite',
+        'javelin-fly': 'javelinFly 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite',
       },
     },
   },
